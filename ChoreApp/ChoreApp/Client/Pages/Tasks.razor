@@ -1,0 +1,51 @@
+﻿@page "/tasks"
+@inject ITaskService TaskService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Tasks</PageTitle>
+
+<h3>Tasks</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Description</th>
+            <th>DueDate</th>
+            <th>Done</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var task in TaskService.Tasks)
+        {
+            <tr>
+                <td>@task.Name</td>
+                <td>@task.Description</td>
+                <td>@task.DueDate</td>
+                <td>@task.Done</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => TaskDetails(task.Id))"><i class="oi oi-pencil"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateNewTask">Create task</button>
+
+@code {
+    protected override async System.Threading.Tasks.Task OnInitializedAsync()
+    {
+        await TaskService.GetTasks();
+    }
+
+    void TaskDetails(int id)
+    {
+        NavigationManager.NavigateTo($"task/{id}");
+    }
+
+    void CreateNewTask()
+    {
+        NavigationManager.NavigateTo("/task");
+    }
+}
