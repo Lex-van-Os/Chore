@@ -1,7 +1,7 @@
+global using Microsoft.EntityFrameworkCore;
+global using ChoreApp.Shared;
+global using ChoreApp.Server.Data;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.EntityFrameworkCore;
-using ChoreApp.Shared;
-using ChoreApp.Server.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +11,11 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddSwaggerGen(options =>
+{
+    options.CustomSchemaIds(type => type.ToString());
+});
+builder.Services.AddSwaggerGenNewtonsoftSupport();
 
 var app = builder.Build();
 
@@ -37,5 +42,13 @@ app.UseRouting();
 app.MapRazorPages();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Blazor API V1");
+    c.ConfigObject.AdditionalItems.Add("syntaxHighlight", false); //Turns off syntax highlight which causing performance issues...
+    c.ConfigObject.AdditionalItems.Add("theme", "agate"); //Reverts Swagger UI 2.x  theme which is simpler not much performance benefit...
+});
 
 app.Run();
